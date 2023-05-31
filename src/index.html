@@ -6,14 +6,30 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Homework 10</title>
+  <link rel="stylesheet" href="./css/styles.css">
 
 </head>
 
 <body>
-  <input type="text" id="search-box" />
-  <ul class="country-list"></ul>
-  <div class="country-info"></div>
 
+  <form class="search-form" id="search-form">
+
+    <header class="search-header">
+      <input type="text" name="searchQuery" autocomplete="off" placeholder="Search images..." />
+      <button class="" type="submit">Search</button>
+
+    </header>
+
+    <section class="gallery-section">
+      <div class="gallery">
+
+      </div>
+    </section>
+
+
+  </form>
+
+  <button type="button" class="load-more hidden">Load more</button>
 
   <script src="index.js" type="module"></script>
 </body>
