@@ -3,6 +3,6 @@ const refs = {
   input: document.querySelector('input'),
   buttonSubmit: document.querySelector('.submit'),
   buttonLoadMore: document.querySelector('.load-more'),
-  divForInfo: document.querySelector('.gallery'),
+  galleryInfo: document.querySelector('.gallery'),
 };
 export default refs;

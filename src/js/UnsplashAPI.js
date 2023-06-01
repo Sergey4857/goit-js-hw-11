@@ -1,4 +1,5 @@
 import axios from 'axios';
+import refs from './refs';
 
 export class UnsplashAPI {
   #BASE_URL = 'https://pixabay.com/api/';

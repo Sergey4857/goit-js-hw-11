@@ -1,6 +1,7 @@
 import refs from './refs';
+export { createMarkup };
 
-export function createMarkup(photos) {
+function createMarkup(photos) {
   const markup = photos
     .map(
       ({
@@ -33,5 +34,5 @@ export function createMarkup(photos) {
     )
     .join('');
 
-  refs.divForInfo.innerHTML = markup;
+  refs.galleryInfo.insertAdjacentHTML('beforeend', markup);
 }
