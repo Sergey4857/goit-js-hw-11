@@ -14,7 +14,8 @@ function createMarkup(photos) {
         views,
       }) => {
         return `<div class="photo-card">
-  <img src="${webformatURL}" alt="${tags}" loading="lazy" width = "406" height = "300"/>
+         <a class='gallery-link link' href="${largeImageURL}">
+  <img src="${webformatURL}" alt="${tags}" loading="lazy" width = "406" height = "300" />
   <div class="info">
     <p class="info-item">
       <b>Likes ${likes}</b>
@@ -29,10 +30,12 @@ function createMarkup(photos) {
       <b>Downloads ${downloads}</b>
     </p>
   </div>
+  </a>
 </div>`;
       }
     )
     .join('');
 
   refs.galleryInfo.insertAdjacentHTML('beforeend', markup);
+  return markup;
 }

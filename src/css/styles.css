@@ -118,5 +118,24 @@ button[type='submit']:hover {
   display: none;
 }
 
+.info {
+  display: flex;
+  justify-content: space-around;
+  padding: 32px 16px;
+  gap: 8px;
+}
+
+.photo-card {
+  display: flex;
+  flex-basis: calc((100% - 60px) / 4);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  align-items: center;
+}
+
 .info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 15;
+  text-align: center;
 }
