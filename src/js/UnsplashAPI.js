@@ -6,8 +6,8 @@ export class UnsplashAPI {
   #API_KEY = '36908542-f1d7c98c12dc13d61a0b80cf6';
   #query = '';
 
-  constructor(perPage = 10) {
-    this.per_page = perPage;
+  constructor() {
+    this.per_page = 40;
   }
 
   getPhotosByQuery(page) {

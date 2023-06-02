@@ -4,9 +4,10 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import refs from './js/refs';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import { createScroll } from './js/scroll';
 
-const unsplashapi = new UnsplashAPI(40);
-let page = 1;
+const unsplashapi = new UnsplashAPI();
+let page;
 let totalPage;
 
 refs.formEL.addEventListener('submit', onSearchFormSubmit);
@@ -16,15 +17,6 @@ async function onSearchFormSubmit(evt) {
 
   const searchQuery = evt.currentTarget.elements.searchQuery.value.trim();
 
-  if (searchQuery === '') {
-    refs.galleryInfo.innerHTML = '';
-    madeButtonInvisible();
-    Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
-    return;
-  }
-
   unsplashapi.query = searchQuery;
   page = 1;
 
@@ -33,19 +25,19 @@ async function onSearchFormSubmit(evt) {
 
     const response = await unsplashapi.getPhotosByQuery(page);
 
-    if (response.data.hits.length === 0) {
+    if (response.data.hits.length === 0 || unsplashapi.query === '') {
       madeButtonInvisible();
-      refs.galleryInfo.innerHTML = '';
-      return Notify.failure(
+      makeStartEmptySearch();
+      Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.',
         { clickToClose: true }
       );
+      return;
     }
 
-    Notify.info(`Hooray! We found ${response.data.totalHits} images.`, {
-      clickToClose: true,
-    });
-    const creationMarkup = await createMarkup(response.data.hits);
+    testOnComplitedREquest(response);
+
+    await createMarkup(response.data.hits);
 
     madeButtonVisible();
 
@@ -56,7 +48,7 @@ async function onSearchFormSubmit(evt) {
       refs.buttonLoadMore.addEventListener('click', onBtnLoadMoreClick);
     }
 
-    let simpleLightBox = new SimpleLightbox('.gallery a').refresh();
+    addSimpleLightBox();
   } catch (error) {
     console.log(error);
   }
@@ -70,22 +62,13 @@ async function onBtnLoadMoreClick() {
 
     totalPage = response.data.totalHits;
 
-    refs.galleryInfo.insertAdjacentHTML(
-      'beforeend',
-      createMarkup(response.data.hits)
-    );
+    createMarkup(response.data.hits);
 
-    simpleLightBox = new SimpleLightbox('.gallery a').refresh();
+    createScroll();
 
-    if (totalPage < page) {
-      madeButtonInvisible();
+    addSimpleLightBox();
 
-      Notify.info(
-        "We're sorry, but you've reached the end of search results.",
-        { clickToClose: true }
-      );
-      return;
-    }
+    testEndOfResult(response);
   } catch (error) {
     console.log(error);
   }
@@ -101,4 +84,27 @@ function madeButtonVisible() {
 
 function madeButtonInvisible() {
   refs.buttonLoadMore.classList.add('hidden');
+}
+
+function testOnComplitedREquest(response) {
+  if (response.data.hits.length > 0) {
+    Notify.info(`Hooray! We found ${response.data.totalHits} images.`, {
+      clickToClose: true,
+    });
+  }
+}
+
+function addSimpleLightBox() {
+  return new SimpleLightbox('.gallery a').refresh();
+}
+
+function testEndOfResult(response) {
+  if (response.data.hits.length < unsplashapi.per_page) {
+    madeButtonInvisible();
+
+    Notify.info("We're sorry, but you've reached the end of search results.", {
+      clickToClose: true,
+    });
+    return;
+  }
 }
