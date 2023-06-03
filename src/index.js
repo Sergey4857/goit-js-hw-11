@@ -7,7 +7,7 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import { createScroll } from './js/scroll';
 
 const unsplashapi = new UnsplashAPI();
-let page;
+
 let totalPage;
 
 refs.formEL.addEventListener('submit', onSearchFormSubmit);
@@ -18,35 +18,30 @@ async function onSearchFormSubmit(evt) {
   const searchQuery = evt.currentTarget.elements.searchQuery.value.trim();
 
   unsplashapi.query = searchQuery;
-  page = 1;
+  unsplashapi.page = 1;
 
   try {
     makeStartEmptySearch();
 
-    const response = await unsplashapi.getPhotosByQuery(page);
+    if (unsplashapi.query === '') {
+      requestDenied();
+      return;
+    }
 
-    if (response.data.hits.length === 0 || unsplashapi.query === '') {
-      madeButtonInvisible();
-      makeStartEmptySearch();
-      Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.',
-        { clickToClose: true }
-      );
+    const response = await unsplashapi.getPhotosByQuery(unsplashapi.page);
+
+    if (response.data.hits.length === 0) {
+      requestDenied();
       return;
     }
 
     testOnComplitedREquest(response);
 
-    await createMarkup(response.data.hits);
+    createMarkup(response.data.hits);
 
     madeButtonVisible();
 
-    if (response.data.totalHits < 40) {
-      madeButtonInvisible();
-      refs.buttonLoadMore.removeEventListener('click', onBtnLoadMoreClick);
-    } else {
-      refs.buttonLoadMore.addEventListener('click', onBtnLoadMoreClick);
-    }
+    testOnLastPage(response);
 
     addSimpleLightBox();
   } catch (error) {
@@ -55,12 +50,22 @@ async function onSearchFormSubmit(evt) {
 }
 
 async function onBtnLoadMoreClick() {
-  page += 1;
+  unsplashapi.incrementPage();
 
   try {
-    const response = await unsplashapi.getPhotosByQuery(page);
+    const response = await unsplashapi.getPhotosByQuery(unsplashapi.page);
 
-    totalPage = response.data.totalHits;
+    totalPage = response.data.totalHits / unsplashapi.per_page;
+
+    if (totalPage < unsplashapi.page) {
+      madeButtonInvisible();
+      refs.buttonLoadMore.removeEventListener('click', onBtnLoadMoreClick);
+      Notify.info(
+        "We're sorry, but you've reached the end of search results.",
+        { clickToClose: true }
+      );
+      return;
+    }
 
     createMarkup(response.data.hits);
 
@@ -106,5 +111,23 @@ function testEndOfResult(response) {
       clickToClose: true,
     });
     return;
+  }
+}
+
+function requestDenied() {
+  madeButtonInvisible();
+  makeStartEmptySearch();
+  Notify.failure(
+    'Sorry, there are no images matching your search query. Please try again.',
+    { clickToClose: true }
+  );
+}
+
+function testOnLastPage(response) {
+  if (response.data.totalHits < 40) {
+    madeButtonInvisible();
+    refs.buttonLoadMore.removeEventListener('click', onBtnLoadMoreClick);
+  } else {
+    refs.buttonLoadMore.addEventListener('click', onBtnLoadMoreClick);
   }
 }
