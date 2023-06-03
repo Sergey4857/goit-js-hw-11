@@ -57,6 +57,8 @@ async function onBtnLoadMoreClick() {
 
     totalPage = response.data.totalHits / unsplashapi.per_page;
 
+    createMarkup(response.data.hits);
+
     if (totalPage < unsplashapi.page) {
       madeButtonInvisible();
       refs.buttonLoadMore.removeEventListener('click', onBtnLoadMoreClick);
@@ -66,8 +68,6 @@ async function onBtnLoadMoreClick() {
       );
       return;
     }
-
-    createMarkup(response.data.hits);
 
     createScroll();
 
